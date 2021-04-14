@@ -12,8 +12,15 @@ function find() { // EXERCISE A
       GROUP BY sc.scheme_id
       ORDER BY sc.scheme_id ASC;
 
+      ANSWER: We wouldn't be able to display the number of steps column because that would only join the common columns between the two tables.
+
     2A- When you have a grasp on the query go ahead and build it in Knex.
     Return from this function the resulting dataset.
+  return db("schemes as sch")
+  .join("steps as stp")
+  
+
+
   */
 }
 
