@@ -155,6 +155,22 @@ function findSteps(scheme_id) { // EXERCISE C
         }
       ]
   */
+
+//FOR ENDPOINT http://localhost:5000/api/schemes/1/steps
+
+//SQL CODE
+// SELECT * FROM [SCHEMES] AS SCH
+// JOIN [STEPS] AS STP
+// ON SCH.SCHEME_ID = STP.SCHEME_ID
+// WHERE SCH.SCHEME_ID = 1
+// ORDER BY STP.STEP_NUMBER ASC
+ 
+return db("schemes as sch")
+.join("steps as st", "sch.scheme_id", "=", "st.scheme_id")
+.select("sch.*", "st.*")
+.where("sch.scheme_id", `${scheme_id}`)
+.orderBy("st.step_number", "ASC") 
+
 }
 
 function add(scheme) { // EXERCISE D
