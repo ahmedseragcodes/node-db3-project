@@ -173,10 +173,21 @@ return db("schemes as sch")
 
 }
 
-function add(scheme) { // EXERCISE D
+async function add(scheme) { // EXERCISE D
   /*
     1D- This function creates a new scheme and resolves to _the newly created scheme_.
   */
+//SQL Code
+// INSERT INTO [SCHEMES] (SCHEME_NAME)
+// VALUES ("Become A Master Programmer")
+
+const addedSchemeID=
+await db("schemes")
+.insert(scheme)
+
+return findById(addedSchemeID);
+
+
 }
 
 function addStep(scheme_id, step) { // EXERCISE E
