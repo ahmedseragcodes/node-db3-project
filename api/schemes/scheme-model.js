@@ -190,12 +190,25 @@ return findById(addedSchemeID);
 
 }
 
-function addStep(scheme_id, step) { // EXERCISE E
+async function addStep(scheme_id, step) { // EXERCISE E
   /*
     1E- This function adds a step to the scheme with the given `scheme_id`
     and resolves to _all the steps_ belonging to the given `scheme_id`,
     including the newly created one.
   */
+
+    // endpoint http://localhost:5000/api/${scheme_id}/1/steps
+    // SQL Light Code  
+    // INSERT INTO [STEPS] (STEP_NUMBER, INSTRUCTIONS, SCHEME_ID )
+    // VALUES ("4", "Build An Army", "1")
+
+    const addedStepId = 
+    await db("steps")
+    .insert(step)
+    .where("scheme_id", scheme_id)
+
+    return findSteps(scheme_id);
+
 }
 
 module.exports = {
