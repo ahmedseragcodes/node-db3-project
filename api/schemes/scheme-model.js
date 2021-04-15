@@ -1,4 +1,5 @@
 const db = require("../../data/db-config");
+const knex=require("knex");
 
 function find() { // EXERCISE A
   /*
@@ -20,14 +21,16 @@ function find() { // EXERCISE A
     Return from this function the resulting dataset.
 
   */
-    return db("schemes")
-    .leftJoin("steps", "schemes.scheme_id", "=", "steps.scheme_id")
-    .select("schemes.scheme_id", "schemes.scheme_name", "steps.step_number", "steps.scheme_id")
-    .groupBy("schemes.scheme_id")
-    .orderBy("schemes.scheme_id", "ASC")  
+    return db("schemes as sch")
+    .leftJoin("steps", "sch.scheme_id", "=", "steps.scheme_id")
+    .select("sch.scheme_id", "sch.scheme_name", "steps.step_number", "steps.scheme_id")
+    .groupBy("sch.scheme_id")
+    .orderBy("sch.scheme_id", "ASC")  
+
+    //.select("sch.scheme_id", "sch.scheme_name", "steps.step_number", "steps.scheme_id")
 }
 
-function findById(scheme_id) { // EXERCISE B
+async function findById(scheme_id) { // EXERCISE B
   /*
     1B- Study the SQL query below running it in SQLite Studio against `data/schemes.db3`:
 
@@ -40,8 +43,24 @@ function findById(scheme_id) { // EXERCISE B
       WHERE sc.scheme_id = 1
       ORDER BY st.step_number ASC;
 
+  ANSWER:
+    return db("schemes as sch")
+      .leftJoin("steps as st", "sch.scheme_id", "=", "st.scheme_id")
+      .select("sch.scheme_name", "st.*")
+      .where("sch.scheme_id", `${scheme_id}`)
+      .orderBy("st.step_number", "ASC") 
+
+
     2B- When you have a grasp on the query go ahead and build it in Knex
     making it parametric: instead of a literal `1` you should use `scheme_id`.
+
+ANSWER:
+
+      return db("schemes as sch")
+      .leftJoin("steps as st", "sch.scheme_id", "=", "st.scheme_id")
+      .select("sch.scheme_name", "st.*")
+      .where("sch.scheme_id", `${scheme_id}`)
+      .orderBy("st.step_number", "ASC") 
 
     3B- Test in Postman and see that the resulting data does not look like a scheme,
     but more like an array of steps each including scheme information:
@@ -93,6 +112,26 @@ function findById(scheme_id) { // EXERCISE B
         "steps": []
       }
   */
+      const schemesStepsTwo = await
+       db("schemes as sch")
+      .leftJoin("steps as st", "sch.scheme_id", "=", "st.scheme_id")
+      .select("sch.scheme_name", "st.*")
+      .where("sch.scheme_id", `${scheme_id}`)
+      .orderBy("st.step_number", "ASC") 
+
+      const schemesStepsThree = {
+        scheme_id: schemesStepsTwo[0].scheme_id,
+        scheme_name: schemesStepsTwo[0].scheme_name,
+        steps: []
+      }
+      
+      schemesStepsTwo.forEach((schemeStepList)=>{
+        return schemesStepsThree.steps.push(schemeStepList)
+      })
+
+
+      return schemesStepsThree;
+
 }
 
 function findSteps(scheme_id) { // EXERCISE C
