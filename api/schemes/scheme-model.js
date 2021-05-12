@@ -1,3 +1,6 @@
+const db = require("../../data/db-config");
+const knex=require("knex");
+
 function find() { // EXERCISE A
   /*
     1A- Study the SQL query below running it in SQLite Studio against `data/schemes.db3`.
@@ -12,12 +15,22 @@ function find() { // EXERCISE A
       GROUP BY sc.scheme_id
       ORDER BY sc.scheme_id ASC;
 
+      ANSWER: We wouldn't be able to display the number of steps column because that would only join the common columns between the two tables.
+
     2A- When you have a grasp on the query go ahead and build it in Knex.
     Return from this function the resulting dataset.
+
   */
+    return db("schemes as sch")
+    .leftJoin("steps", "sch.scheme_id", "=", "steps.scheme_id")
+    .select("sch.scheme_id", "sch.scheme_name", "steps.step_number", "steps.scheme_id")
+    .groupBy("sch.scheme_id")
+    .orderBy("sch.scheme_id", "ASC")  
+
+    //.select("sch.scheme_id", "sch.scheme_name", "steps.step_number", "steps.scheme_id")
 }
 
-function findById(scheme_id) { // EXERCISE B
+async function findById(scheme_id) { // EXERCISE B
   /*
     1B- Study the SQL query below running it in SQLite Studio against `data/schemes.db3`:
 
@@ -30,8 +43,24 @@ function findById(scheme_id) { // EXERCISE B
       WHERE sc.scheme_id = 1
       ORDER BY st.step_number ASC;
 
+  ANSWER:
+    return db("schemes as sch")
+      .leftJoin("steps as st", "sch.scheme_id", "=", "st.scheme_id")
+      .select("sch.scheme_name", "st.*")
+      .where("sch.scheme_id", `${scheme_id}`)
+      .orderBy("st.step_number", "ASC") 
+
+
     2B- When you have a grasp on the query go ahead and build it in Knex
     making it parametric: instead of a literal `1` you should use `scheme_id`.
+
+ANSWER:
+
+      return db("schemes as sch")
+      .leftJoin("steps as st", "sch.scheme_id", "=", "st.scheme_id")
+      .select("sch.scheme_name", "st.*")
+      .where("sch.scheme_id", `${scheme_id}`)
+      .orderBy("st.step_number", "ASC") 
 
     3B- Test in Postman and see that the resulting data does not look like a scheme,
     but more like an array of steps each including scheme information:
@@ -83,6 +112,26 @@ function findById(scheme_id) { // EXERCISE B
         "steps": []
       }
   */
+      const schemesStepsTwo = await
+       db("schemes as sch")
+      .leftJoin("steps as st", "sch.scheme_id", "=", "st.scheme_id")
+      .select("sch.scheme_name", "st.*")
+      .where("sch.scheme_id", `${scheme_id}`)
+      .orderBy("st.step_number", "ASC") 
+
+      const schemesStepsThree = {
+        scheme_id: schemesStepsTwo[0].scheme_id,
+        scheme_name: schemesStepsTwo[0].scheme_name,
+        steps: []
+      }
+      
+      schemesStepsTwo.forEach((schemeStepList)=>{
+        return schemesStepsThree.steps.push(schemeStepList)
+      })
+
+
+      return schemesStepsThree;
+
 }
 
 function findSteps(scheme_id) { // EXERCISE C
@@ -106,20 +155,60 @@ function findSteps(scheme_id) { // EXERCISE C
         }
       ]
   */
+
+//FOR ENDPOINT http://localhost:5000/api/schemes/1/steps
+
+//SQL CODE
+// SELECT * FROM [SCHEMES] AS SCH
+// JOIN [STEPS] AS STP
+// ON SCH.SCHEME_ID = STP.SCHEME_ID
+// WHERE SCH.SCHEME_ID = 1
+// ORDER BY STP.STEP_NUMBER ASC
+ 
+return db("schemes as sch")
+.join("steps as st", "sch.scheme_id", "=", "st.scheme_id")
+.select("sch.*", "st.*")
+.where("sch.scheme_id", `${scheme_id}`)
+.orderBy("st.step_number", "ASC") 
+
 }
 
-function add(scheme) { // EXERCISE D
+async function add(scheme) { // EXERCISE D
   /*
     1D- This function creates a new scheme and resolves to _the newly created scheme_.
   */
+//SQL Code
+// INSERT INTO [SCHEMES] (SCHEME_NAME)
+// VALUES ("Become A Master Programmer")
+
+const addedSchemeID=
+await db("schemes")
+.insert(scheme)
+
+return findById(addedSchemeID);
+
+
 }
 
-function addStep(scheme_id, step) { // EXERCISE E
+async function addStep(scheme_id, step) { // EXERCISE E
   /*
     1E- This function adds a step to the scheme with the given `scheme_id`
     and resolves to _all the steps_ belonging to the given `scheme_id`,
     including the newly created one.
   */
+
+    // endpoint http://localhost:5000/api/${scheme_id}/1/steps
+    // SQL Light Code  
+    // INSERT INTO [STEPS] (STEP_NUMBER, INSTRUCTIONS, SCHEME_ID )
+    // VALUES ("4", "Build An Army", "1")
+
+    const addedStepId = 
+    await db("steps")
+    .insert(step)
+    .where("scheme_id", scheme_id)
+
+    return findSteps(scheme_id);
+
 }
 
 module.exports = {
