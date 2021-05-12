@@ -1,3 +1,5 @@
+const db = require("../../data/db-config");
+
 function find() { // EXERCISE A
   /*
     1A- Study the SQL query below running it in SQLite Studio against `data/schemes.db3`.
@@ -12,12 +14,20 @@ function find() { // EXERCISE A
       GROUP BY sc.scheme_id
       ORDER BY sc.scheme_id ASC;
 
+      ANSWER: If you do an inner join instead of a left join, additional columns from the steps table like step_number, instructions will be included
+
     2A- When you have a grasp on the query go ahead and build it in Knex.
     Return from this function the resulting dataset.
   */
+
+  return db("schemes as sc")
+  .join("steps as st", "st.scheme_id", "sc.scheme_id")
+  .groupBy("sc.scheme_id")
+  .orderBy("sc.scheme_id", "ASC")
+
 }
 
-function findById(scheme_id) { // EXERCISE B
+async function findById(scheme_id) { // EXERCISE B
   /*
     1B- Study the SQL query below running it in SQLite Studio against `data/schemes.db3`:
 
@@ -83,6 +93,24 @@ function findById(scheme_id) { // EXERCISE B
         "steps": []
       }
   */
+
+
+      const specificSchemesSteps = await db("schemes as sc")
+      .select("st.*", "sc.scheme_name")
+      .leftJoin("steps as st", "st.scheme_id", "sc.scheme_id")
+      .where("st.scheme_id", scheme_id)
+      .orderBy("st.step_number", "ASC")
+
+      const schemeToBeReturned = {
+        scheme_id: specificSchemesSteps[0].scheme_id,
+        scheme_name: specificSchemesSteps[0].scheme_name,
+        steps: specificSchemesSteps.map((eachStep)=>{
+          return eachStep;
+        })
+      }
+
+      return schemeToBeReturned;
+
 }
 
 function findSteps(scheme_id) { // EXERCISE C
@@ -106,6 +134,12 @@ function findSteps(scheme_id) { // EXERCISE C
         }
       ]
   */
+
+      return db("schemes as sc")
+      .join("steps as st", "sc.scheme_id", "st.scheme_id")
+      .where("sc.scheme_id", scheme_id)
+      .select("st.step_id", "st.step_number", "st.instructions", "sc.scheme_name" )
+      .orderBy("st.step_number", "ASC");
 }
 
 function add(scheme) { // EXERCISE D
