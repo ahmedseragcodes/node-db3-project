@@ -6,7 +6,7 @@ const Schemes = require('./scheme-model.js')
 const router = express.Router()
 
 /**
-  [GET] /api/schemes
+  [GET] /api/schemes - [GET] ALL SCHEMES 
 
   response:
   [
@@ -32,7 +32,7 @@ router.get('/', (req, res, next) => {
 })
 
 /*
-  [GET] /api/schemes/2
+  [GET] /api/schemes/2 - [GET] Scheme By Id
 
   response:
   {
@@ -63,7 +63,7 @@ router.get('/:scheme_id', checkSchemeId, (req, res, next) => {
 })
 
 /*
-  [GET] /api/schemes/2/steps
+  [GET] /api/schemes/2/steps - [GET] All Specific Schemes Steps 
 
   response:
   [
@@ -92,7 +92,7 @@ router.get('/:scheme_id/steps', checkSchemeId, (req, res, next) => {
 })
 
 /*
-  [POST] /api/schemes { "scheme_name": "Take Ovah" }
+  [POST] /api/schemes { "scheme_name": "Take Ovah" } - [POST] New Scheme 
 
   response:
   {
