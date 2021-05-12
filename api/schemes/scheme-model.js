@@ -20,10 +20,17 @@ function find() { // EXERCISE A
     Return from this function the resulting dataset.
   */
 
-  return db("schemes as sc")
-  .join("steps as st", "st.scheme_id", "sc.scheme_id")
+    // SELECT SCHEMES.SCHEME_ID, SCHEMES.SCHEME_NAME, COUNT(STEPS.SCHEME_ID) "Number Of Steps" FROM STEPS
+    // JOIN SCHEMES ON STEPS.SCHEME_ID = SCHEMES.SCHEME_ID
+    // WHERE STEPS.SCHEME_ID = 1
+
+
+  return db("steps as st")
+  .select("sc.scheme_id", "sc.scheme_name")
+  .count("st.scheme_id as number_of_steps")
+  .join("schemes as sc", "st.scheme_id", "sc.scheme_id")
   .groupBy("sc.scheme_id")
-  .orderBy("sc.scheme_id", "ASC")
+  
 
 }
 
