@@ -92,7 +92,7 @@ router.get('/:scheme_id/steps', checkSchemeId, (req, res, next) => {
 })
 
 /*
-  [POST] /api/schemes { "scheme_name": "Take Ovah" }
+  [POST] /api/schemes { "scheme_name": "Take Ovah" } - [POST] New Scheme 
 
   response:
   {
